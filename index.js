@@ -11,11 +11,32 @@ const io = socketio(server, {
   },
 });
 
+let activeSockets = [];
+
 io.on("connection", (socket) => {
   socket.emit("me", socket.id);
+  activeSockets.push(socket.id);
+
+  socket.on("activity", () => {
+    socket.lastActivity = Date.now();
+  });
+
+  socket.emit(
+    "serverliveList",
+    activeSockets.filter((id) => id !== socket.id)
+  );
+
   socket.on("disconnect", () => {
     socket.broadcast.emit("disconnected");
+    activeSockets = activeSockets.filter((id) => id !== socket.id);
+
+    // Send the updated active socket list to all connected clients if it has changed
+    if (JSON.stringify(activeSockets) !== JSON.stringify(io.activeSockets)) {
+      io.activeSockets = activeSockets;
+      io.emit("serverliveList", activeSockets);
+    }
   });
+
   socket.on("callUser", (data) => {
     io.to(data.userToCall).emit("callUser", {
       signal: data.signalData,
@@ -26,6 +47,20 @@ io.on("connection", (socket) => {
   socket.on("ansCall", (data) => {
     io.to(data.to).emit("callAccepted"), data.signal;
   });
+  socket.on("sendMsg", (msg) => {
+    console.log(`sending ${msg.txt} from ${msg.from} to ${msg.to}`);
+    io.to(msg.to).emit("recMsg", msg);
+  });
+
+  socket.on("invite", (invite) => {
+    io.to(invite.to).emit("invite", invite);
+  });
+
+  socket.on("invAcc", (inv) => {
+    io.to(inv.from).emit("invAcc", inv);
+  });
+
+  socket.lastActivity = Date.now();
 });
 
 server.listen(process.env.PORT || 8000, () => {
