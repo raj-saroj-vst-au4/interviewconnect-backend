@@ -17,14 +17,7 @@ io.on("connection", (socket) => {
   socket.emit("me", socket.id);
   activeSockets.push(socket.id);
 
-  socket.on("activity", () => {
-    socket.lastActivity = Date.now();
-  });
-
-  socket.emit(
-    "serverliveList",
-    activeSockets.filter((id) => id !== socket.id)
-  );
+  socket.emit("serverliveList", activeSockets);
 
   socket.on("disconnect", () => {
     socket.broadcast.emit("disconnected");
@@ -48,7 +41,7 @@ io.on("connection", (socket) => {
     io.to(data.to).emit("callAccepted"), data.signal;
   });
   socket.on("sendMsg", (msg) => {
-    console.log(`sending ${msg.txt} from ${msg.from} to ${msg.to}`);
+    // console.log(`sending ${msg.txt} from ${msg.from} to ${msg.to}`);
     io.to(msg.to).emit("recMsg", msg);
   });
 
