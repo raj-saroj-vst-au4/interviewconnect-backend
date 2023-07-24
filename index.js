@@ -30,16 +30,19 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("callUser", (data) => {
-    io.to(data.userToCall).emit("callUser", {
-      signal: data.signalData,
-      from: data.from,
-      name: data.name,
-    });
+  socket.on("callUser", ({ from, to, offer }) => {
+    // console.log(offer);
+    io.to(to).emit("vcIncoming", { from, offer });
   });
-  socket.on("ansCall", (data) => {
-    io.to(data.to).emit("callAccepted"), data.signal;
+
+  socket.on("vcStart", ({ from, to, answer }) => {
+    io.to(to).emit("vcStart", { from, answer });
   });
+
+  socket.on("vcEnd", ({ to }) => {
+    io.to(to).emit("vcEnd");
+  });
+
   socket.on("sendMsg", (msg) => {
     // console.log(`sending ${msg.txt} from ${msg.from} to ${msg.to}`);
     io.to(msg.to).emit("recMsg", msg);
@@ -52,8 +55,6 @@ io.on("connection", (socket) => {
   socket.on("invAcc", (inv) => {
     io.to(inv.from).emit("invAcc", inv);
   });
-
-  socket.lastActivity = Date.now();
 });
 
 server.listen(process.env.PORT || 8000, () => {
