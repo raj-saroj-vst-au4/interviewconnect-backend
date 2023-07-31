@@ -30,16 +30,8 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("callUser", ({ from, to, offer }) => {
-    // console.log(offer);
-    io.to(to).emit("vcIncoming", { from, offer });
-  });
-
-  socket.on("vcStart", ({ from, to, answer }) => {
-    io.to(to).emit("vcStart", { from, answer });
-  });
-
-  socket.on("vcEnd", ({ to }) => {
+  socket.on("vcEnd", (to) => {
+    console.log("ending call with", to);
     io.to(to).emit("vcEnd");
   });
 
