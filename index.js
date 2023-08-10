@@ -11,6 +11,10 @@ const io = socketio(server, {
   },
 });
 
+app.use(cors({
+  origin: 'https://leafy-hamster-d4d9b4.netlify.app'
+}));
+
 let activeSockets = [];
 
 app.get('/', (req, res) => {
