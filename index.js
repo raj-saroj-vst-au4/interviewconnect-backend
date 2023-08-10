@@ -13,6 +13,10 @@ const io = socketio(server, {
 
 let activeSockets = [];
 
+app.get('/', (req, res) => {
+  res.send('Server is up');
+});
+
 io.on("connection", (socket) => {
   socket.emit("me", socket.id);
   activeSockets.push(socket.id);
