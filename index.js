@@ -1,7 +1,6 @@
 const express = require("express");
 const http = require("http");
 const socketio = require("socket.io");
-const cors = require('cors')
 
 const app = express();
 const server = http.createServer(app);
@@ -12,15 +11,9 @@ const io = socketio(server, {
   },
 });
 
-app.use(cors({
-  origin: 'https://leafy-hamster-d4d9b4.netlify.app'
-}));
 
 let activeSockets = [];
 
-app.get('/', (req, res) => {
-  res.send('Server is up');
-});
 
 io.on("connection", (socket) => {
   socket.emit("me", socket.id);
