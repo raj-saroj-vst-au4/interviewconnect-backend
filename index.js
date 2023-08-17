@@ -20,7 +20,7 @@ io.on("connection", (socket) => {
   activeSockets.push(socket.id);
 
   
-  socket.emit("serverliveList", activeSockets)
+  socket.broadcast.emit("serverliveList", activeSockets)
 
   socket.on("disconnect", () => {
     socket.broadcast.emit("disconnected");
@@ -34,7 +34,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("vcEnd", (to) => {
-    console.log("ending call with", to);
+    // console.log("ending call with", to);
     io.to(to).emit("vcEnd");
   });
 
