@@ -19,9 +19,8 @@ io.on("connection", (socket) => {
   socket.emit("me", socket.id);
   activeSockets.push(socket.id);
 
-  if(activeSockets.length !== 0){
-    socket.emit("serverliveList", activeSockets);
-  }
+  
+  socket.emit("serverliveList", activeSockets.filter((id) => id !== socket.id))
 
   socket.on("disconnect", () => {
     socket.broadcast.emit("disconnected");
